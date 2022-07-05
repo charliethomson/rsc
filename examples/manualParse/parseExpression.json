@@ -1,0 +1,655 @@
+{
+  "data": {
+    "stmts": [
+      {
+        "ty": "decl",
+        "subty": "type",
+        "inner": {
+          "lhs": {
+            "ty": "ident",
+            "ident": "scanner"
+          },
+          "rhs": {
+            "ty": "type",
+            "val": {
+              "fields": [
+                {
+                  "ty": "field",
+                  "inner": { "ident": "buffer", "ty": "string" }
+                },
+                {
+                  "ty": "field",
+                  "inner": { "ident": "idx", "ty": "number", "init": 0 }
+                },
+                {
+                  "ty": "field",
+                  "inner": {
+                    "ident": "current",
+                    "ty": "token",
+                    "optional": true
+                  }
+                },
+                {
+                  "ty": "field",
+                  "inner": {
+                    "ident": "previous",
+                    "ty": "token[]",
+                    "init": []
+                  }
+                }
+              ],
+              "methods": [
+                {
+                  "ty": "func",
+                  "subty": "method",
+                  "inner": {
+                    "ident": "scan",
+                    "body": [
+                      {
+                        "ty": "if",
+                        "inner": {
+                          "cond": {
+                            "ty": "op",
+                            "subty": "ne",
+                            "inner": {
+                              "lhs": {
+                                "ty": "ref",
+                                "subty": "fieldref",
+                                "refs": "this",
+                                "ident": "current"
+                              },
+                              "rhs": {
+                                "ty": "nil"
+                              }
+                            }
+                          },
+                          "then": [
+                            {
+                              "ty": "call",
+                              "inner": {
+                                "func": {
+                                  "ty": "ref",
+                                  "refs": {
+                                    "ty": "ref",
+                                    "subty": "fieldref",
+                                    "refs": "this",
+                                    "ident": "previous"
+                                  },
+                                  "ident": "add"
+                                },
+                                "args": [
+                                  {
+                                    "ty": "ref",
+                                    "subty": "fieldref",
+                                    "refs": "this",
+                                    "ident": "current"
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "else": null
+                        }
+                      },
+                      {
+                        "ty": "if",
+                        "inner": {
+                          "cond": {
+                            "ty": "op",
+                            "subty": "ge",
+                            "inner": {
+                              "lhs": {
+                                "ty": "ref",
+                                "subty": "fieldref",
+                                "refs": "this",
+                                "ident": "index"
+                              },
+                              "rhs": {
+                                "ty": "ref",
+                                "subty": "fieldref",
+                                "refs": {
+                                  "ty": "ref",
+                                  "subty": "fieldref",
+                                  "refs": "this",
+                                  "ident": "buffer"
+                                },
+                                "ident": "length"
+                              }
+                            }
+                          },
+                          "then": [
+                            {
+                              "ty": "return",
+                              "inner": {
+                                "ty": "false"
+                              }
+                            }
+                          ],
+                          "else": null
+                        }
+                      },
+                      {
+                        "ty": "assn",
+                        "inner": {
+                          "lhs": { "ty": "ident", "ident": "classficiation" },
+                          "rhs": {
+                            "ty": "call",
+                            "inner": {
+                              "func": {
+                                "ty": "ref",
+                                "subty": "func",
+                                "refs": "global",
+                                "ident": "classifyCharacter"
+                              },
+                              "args": [
+                                {
+                                  "ty": "op",
+                                  "subty": "index",
+                                  "inner": {
+                                    "lhs": {
+                                      "ty": "ref",
+                                      "subty": "fieldref",
+                                      "refs": "this",
+                                      "ident": "buffer"
+                                    },
+                                    "rhs": {
+                                      "ty": "ref",
+                                      "subty": "fieldref",
+                                      "refs": "this",
+                                      "ident": "index"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "ty": "assn",
+                        "inner": {
+                          "lhs": { "ty": "ident", "ident": "classficiation" },
+                          "rhs": {
+                            "ty": "ref",
+                            "subty": "fieldref",
+                            "refs": "this",
+                            "ident": "index"
+                          }
+                        }
+                      },
+                      {
+                        "ty": "assn",
+                        "inner": {
+                          "lhs": {
+                            "ty": "ref",
+                            "subty": "fieldref",
+                            "refs": "this",
+                            "ident": "current"
+                          },
+                          "rhs": {
+                            "ty": "when",
+                            "conds": [
+                              {
+                                "cond": {
+                                  "ty": "op",
+                                  "subty": "eq",
+                                  "inner": {
+                                    "lhs": {
+                                      "ty": "ref",
+                                      "refs": "local",
+                                      "ident": "classficiation"
+                                    },
+                                    "rhs": {
+                                      "ty": "string",
+                                      "val": "white"
+                                    }
+                                  }
+                                },
+                                "then": [
+                                  {
+                                    "ty": "while",
+                                    "cond": {
+                                      "ty": "op",
+                                      "subty": "and",
+                                      "inner": {
+                                        "lhs": {
+                                          "ty": "op",
+                                          "subty": "lt",
+                                          "inner": {
+                                            "lhs": {
+                                              "ty": "ref",
+                                              "subty": "fieldref",
+                                              "refs": "this",
+                                              "ident": "index"
+                                            },
+                                            "rhs": {
+                                              "ty": "ref",
+                                              "subty": "fieldref",
+                                              "refs": {
+                                                "ty": "ref",
+                                                "subty": "fieldref",
+                                                "refs": "this",
+                                                "ident": "buffer"
+                                              },
+                                              "ident": "length"
+                                            }
+                                          }
+                                        },
+                                        "rhs": {
+                                          "ty": "op",
+                                          "subty": "eq",
+                                          "inner": {
+                                            "lhs": {
+                                              "ty": "call",
+                                              "inner": {
+                                                "func": {
+                                                  "ty": "ref",
+                                                  "refs": "global",
+                                                  "ident": "classifyCharacter"
+                                                },
+                                                "args": [
+                                                  {
+                                                    "ty": "op",
+                                                    "subty": "index",
+                                                    "inner": {
+                                                      "lhs": {
+                                                        "ty": "ref",
+                                                        "subty": "fieldref",
+                                                        "refs": "this",
+                                                        "ident": "buffer"
+                                                      },
+                                                      "rhs": {
+                                                        "ty": "ref",
+                                                        "subty": "fieldref",
+                                                        "refs": "this",
+                                                        "ident": "index"
+                                                      }
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            },
+                                            "rhs": {
+                                              "ty": "string",
+                                              "val": "white"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "then": [
+                                      {
+                                        "ty": "op",
+                                        "subty": "inc",
+                                        "inner": {
+                                          "lhs": {
+                                            "ty": "ref",
+                                            "subty": "fieldref",
+                                            "refs": "this",
+                                            "ident": "index"
+                                          },
+                                          "rhs": null
+                                        }
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "ty": "return",
+                                    "inner": {
+                                      "ty": "op",
+                                      "subty": "not",
+                                      "inner": {
+                                        "lhs": null,
+                                        "rhs": {
+                                          "ty": "op",
+                                          "subty": "eq",
+                                          "inner": {
+                                            "lhs": {
+                                              "ty": "ref",
+                                              "subty": "fieldref",
+                                              "refs": "this",
+                                              "ident": "index"
+                                            },
+                                            "rhs": {
+                                              "ty": "ref",
+                                              "subty": "fieldref",
+                                              "refs": {
+                                                "ty": "ref",
+                                                "subty": "fieldref",
+                                                "refs": "this",
+                                                "ident": "buffer"
+                                              },
+                                              "ident": "length"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "cond": {
+                                  "ty": "op",
+                                  "subty": "eq",
+                                  "inner": {
+                                    "lhs": {
+                                      "ty": "ref",
+                                      "refs": "local",
+                                      "ident": "classficiation"
+                                    },
+                                    "rhs": {
+                                      "ty": "string",
+                                      "val": "numeric"
+                                    }
+                                  }
+                                },
+                                "then": [
+                                  {
+                                    "ty": "while",
+                                    "cond": {
+                                      "ty": "op",
+                                      "subty": "and",
+                                      "inner": {
+                                        "lhs": {
+                                          "ty": "op",
+                                          "subty": "lt",
+                                          "inner": {
+                                            "lhs": {
+                                              "ty": "ref",
+                                              "subty": "fieldref",
+                                              "refs": "this",
+                                              "ident": "index"
+                                            },
+                                            "rhs": {
+                                              "ty": "ref",
+                                              "subty": "fieldref",
+                                              "refs": {
+                                                "ty": "ref",
+                                                "subty": "fieldref",
+                                                "refs": "this",
+                                                "ident": "buffer"
+                                              },
+                                              "ident": "length"
+                                            }
+                                          }
+                                        },
+                                        "rhs": {
+                                          "ty": "op",
+                                          "subty": "eq",
+                                          "inner": {
+                                            "lhs": {
+                                              "ty": "call",
+                                              "inner": {
+                                                "func": {
+                                                  "ty": "ref",
+                                                  "refs": "global",
+                                                  "ident": "classifyCharacter"
+                                                },
+                                                "args": [
+                                                  {
+                                                    "ty": "op",
+                                                    "subty": "index",
+                                                    "inner": {
+                                                      "lhs": {
+                                                        "ty": "ref",
+                                                        "subty": "fieldref",
+                                                        "refs": "this",
+                                                        "ident": "buffer"
+                                                      },
+                                                      "rhs": {
+                                                        "ty": "ref",
+                                                        "subty": "fieldref",
+                                                        "refs": "this",
+                                                        "ident": "index"
+                                                      }
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            },
+                                            "rhs": {
+                                              "ty": "string",
+                                              "val": "numeric"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "then": [
+                                      {
+                                        "ty": "op",
+                                        "subty": "inc",
+                                        "inner": {
+                                          "lhs": {
+                                            "ty": "ref",
+                                            "subty": "fieldref",
+                                            "refs": "this",
+                                            "ident": "index"
+                                          },
+                                          "rhs": null
+                                        }
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "ty": "if",
+                                    "inner": {
+                                      "cond": {
+                                        "ty": "op",
+                                        "subty": "eq",
+                                        "inner": {
+                                          "lhs": {
+                                            "ty": "ref",
+                                            "subty": "fieldref",
+                                            "refs": "this",
+                                            "ident": "index"
+                                          },
+                                          "rhs": {
+                                            "ty": "ref",
+                                            "subty": "fieldref",
+                                            "refs": {
+                                              "ty": "ref",
+                                              "subty": "fieldref",
+                                              "refs": "this",
+                                              "ident": "buffer"
+                                            },
+                                            "ident": "length"
+                                          }
+                                        }
+                                      },
+                                      "then": [
+                                        {
+                                          "ty": "return",
+                                          "inner": {
+                                            "ty": "false"
+                                          }
+                                        }
+                                      ],
+                                      "else": null
+                                    }
+                                  },
+                                  {
+                                    "ty": "call",
+                                    "inner": {
+                                      "func": {
+                                        "ty": "ref",
+                                        "refs": {
+                                          "ty": "ref",
+                                          "refs": "global",
+                                          "ident": "token"
+                                        },
+                                        "ident": "createValue"
+                                      },
+                                      "args": [
+                                        {
+                                          "ty": "op",
+                                          "subty": "index",
+                                          "inner": {
+                                            "lhs": {
+                                              "ty": "ref",
+                                              "subty": "fieldref",
+                                              "refs": "this",
+                                              "ident": "buffer"
+                                            },
+                                            "rhs": {
+                                              "ty": "slice",
+                                              "inner": {
+                                                "lhs": {
+                                                  "ty": "ref",
+                                                  "refs": "local",
+                                                  "ident": "start"
+                                                },
+                                                "rhs": {
+                                                  "ty": "ref",
+                                                  "subty": "fieldref",
+                                                  "refs": "this",
+                                                  "ident": "index"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "cond": {
+                                  "ty": "op",
+                                  "subty": "eq",
+                                  "inner": {
+                                    "lhs": {
+                                      "ty": "ref",
+                                      "refs": "local",
+                                      "ident": "classficiation"
+                                    },
+                                    "rhs": {
+                                      "ty": "string",
+                                      "val": "operator"
+                                    }
+                                  }
+                                },
+                                "then": [
+                                  {
+                                    "ty": "call",
+                                    "inner": {
+                                      "func": {
+                                        "ty": "ref",
+                                        "subty": "fieldref",
+                                        "refs": {
+                                          "ty": "ref",
+                                          "refs": "global",
+                                          "ident": "token"
+                                        },
+                                        "ident": "createOperator"
+                                      },
+                                      "args": [
+                                        {
+                                          "ty": "op",
+                                          "subty": "index",
+                                          "inner": {
+                                            "lhs": {
+                                              "ty": "ref",
+                                              "subty": "fieldref",
+                                              "refs": "this",
+                                              "ident": "buffer"
+                                            },
+                                            "rhs": {
+                                              "ty": "op",
+                                              "subty": "inc",
+                                              "inner": {
+                                                "lhs": {
+                                                  "ty": "ref",
+                                                  "subty": "fieldref",
+                                                  "refs": "this",
+                                                  "ident": "index"
+                                                },
+                                                "rhs": null
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "cond": {
+                                  "ty": "op",
+                                  "subty": "eq",
+                                  "inner": {
+                                    "lhs": {
+                                      "ty": "ref",
+                                      "refs": "local",
+                                      "ident": "classficiation"
+                                    },
+                                    "rhs": {
+                                      "ty": "string",
+                                      "val": "paren"
+                                    }
+                                  }
+                                },
+                                "then": [
+                                  {
+                                    "ty": "call",
+                                    "inner": {
+                                      "func": {
+                                        "ty": "ref",
+                                        "subty": "fieldref",
+                                        "refs": {
+                                          "ty": "ref",
+                                          "refs": "global",
+                                          "ident": "token"
+                                        },
+                                        "ident": "createParen"
+                                      },
+                                      "args": [
+                                        {
+                                          "ty": "op",
+                                          "subty": "index",
+                                          "inner": {
+                                            "lhs": {
+                                              "ty": "ref",
+                                              "subty": "fieldref",
+                                              "refs": "this",
+                                              "ident": "buffer"
+                                            },
+                                            "rhs": {
+                                              "ty": "op",
+                                              "subty": "inc",
+                                              "inner": {
+                                                "lhs": {
+                                                  "ty": "ref",
+                                                  "subty": "fieldref",
+                                                  "refs": "this",
+                                                  "ident": "index"
+                                                },
+                                                "rhs": null
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                            "default": null
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}
