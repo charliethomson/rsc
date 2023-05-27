@@ -1,4 +1,5 @@
 use chrono::Utc;
+use parser::ast::context::ParseContext;
 use pest::Parser;
 use pest_derive::Parser;
 
@@ -33,6 +34,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
 fn main() {
     setup_logger().unwrap();
     let unparsed_file = fs::read_to_string("./samples/playground.fn").expect("cannot read file");
+    ParseContext::init();
 
     let file = FNSParser::parse(Rule::file, &unparsed_file)
         .expect("unsuccessful parse") // unwrap the parse result

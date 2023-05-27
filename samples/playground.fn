@@ -1,1 +1,6 @@
-def main => a + 10
+fn main(a int) => a + 10
+fn main(int) => $ + 10
+fn main(a) => a + 10
+fn main(a) => {
+    let b int
+}

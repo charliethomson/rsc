@@ -1,14 +1,19 @@
 WHITESPACE = _{ " " }
 
-let = _{ "let" }
+KW_let = _{ "let" }
+KW_fn = _{ "fn" }
+KW_type = _{ "type" }
 keyword = _{
-    let
+    KW_let
+  | KW_fn
+  | KW_type
 }
 
 ident_char = _{ ASCII_ALPHANUMERIC | "_" }
 ident      =  @{
-    !keyword ~ ASCII_ALPHA ~ ident_char* |
-    !keyword ~ "_" ~ ident_char+
+    !keyword ~ ASCII_ALPHA ~ ident_char* 
+  | !keyword ~ "_" ~ ident_char+ 
+  | !keyword ~ "$" ~ ASCII_DIGIT?
 }
 
 plus  = { "+" }
@@ -42,12 +47,12 @@ literal = {
     number | string | chr | bool
 }
 
-typ_int  = { "int" }
-typ_float  = { "float" }
-typ_char = { "char" }
-typ_str = { "str" }
+native_int  = { "int" }
+native_float  = { "float" }
+native_char = { "char" }
+native_str = { "str" }
 
-typ = { typ_int | typ_float | typ_char | typ_str | ident }
+native = { native_int | native_float | native_char | native_str }
 
 inc = { "++" }
 dec = { "--" }
@@ -120,8 +125,8 @@ atom = _{ literal | ident | ("(" ~ expr ~ ")") }
 primary = _{ prefix* ~ atom ~ postfix* }
 call = { primary ~ "(" ~ expr? ~ ")" }
 assignment = { 
-    let? ~ ident ~ typ? ~ "=" ~ expr
-  | let ~ ident ~ typ
+    KW_let? ~ ident ~ ident? ~ "=" ~ expr
+  | KW_let ~ ident ~ ident
 }
 expr = { 
     call
@@ -138,7 +143,11 @@ stmts = {
     | expr
 }
 
-function_parameter = { ident ~ typ }
+function_parameter = { 
+    ident ~ ident
+  | native
+  | ident
+}
 function_parameters = {
     ( "(" ~ (
         ((function_parameter ~ ",")+ ~ (function_parameter))
@@ -146,7 +155,7 @@ function_parameters = {
     ) ~ ")" )?
 }
 
-function = { "def" ~ ident ~ function_parameters ~ "=>" ~ stmts ~ NEWLINE? }
+function = { KW_fn ~ ident ~ function_parameters ~ "=>" ~ stmts ~ NEWLINE? }
 
 file = {
     SOI 

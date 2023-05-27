@@ -73,15 +73,15 @@ impl Expression {
         let type_or_value = rules
             .next()
             .ok_or(missing("expr-assignment(type_or_value)"))?;
-        let (typ, value) = if matches!(type_or_value.as_rule(), Rule::typ) {
-            (Some(type_or_value), rules.next())
-        } else {
+        let (typ, value) = if matches!(type_or_value.as_rule(), Rule::expr) {
             (None, Some(type_or_value))
+        } else {
+            (Some(type_or_value), rules.next())
         };
 
         let assignment = Self::Assignment {
             name: Ident::parse(ident)?,
-            typ: typ.map(|t| Ident::parse(t)).transpose()?,
+            typ: typ.map(|t| Ident::parse_expect_type(t)).transpose()?,
             value: value.map(|v| Self::parse_boxed(v)).transpose()?,
         };
 

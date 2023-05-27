@@ -120,6 +120,7 @@ dependencies = [
  "fern",
  "lazy_static",
  "log",
+ "once_cell",
  "pest",
  "pest_derive",
  "regex",
