@@ -1,0 +1,155 @@
+WHITESPACE = _{ " " }
+
+let = _{ "let" }
+keyword = _{
+    let
+}
+
+ident_char = _{ ASCII_ALPHANUMERIC | "_" }
+ident      =  @{
+    !keyword ~ ASCII_ALPHA ~ ident_char* |
+    !keyword ~ "_" ~ ident_char+
+}
+
+plus  = { "+" }
+minus = { "-" }
+sign = { plus | minus }
+int = @{ ASCII_DIGIT ~ (ASCII_DIGIT | "_")* }
+exp   = { "e" ~ (plus | minus)? ~ int }
+number = @{ 
+    sign?
+    ~ ("0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT*)
+    ~ ("." ~ ASCII_DIGIT*)?
+    ~ (^"e" ~ sign? ~ ASCII_DIGIT+)?
+ }
+
+true_lit  = { "true" }
+false_lit = { "false" }
+bool      = { true_lit | false_lit }
+
+hex = _{ '0'..'9' | 'a'..'f' | 'A'..'F' }
+unicode_hex = { hex{1, 6} }
+predefined = { "n" | "r" | "t" | "\\" | "0" | "\"" | "'" }
+byte       = { "x" ~ hex{2} }
+unicode    = { "u" ~ "{" ~ unicode_hex ~ "}" }
+escape     = { "\\" ~ (predefined | byte | unicode) }
+raw_string = { (!("\\" | "\"") ~ ANY)+ }
+string = { "\"" ~ (raw_string | escape)* ~ "\"" }
+raw_chr = { escape | ANY }
+chr = { "'" ~ (raw_chr) ~ "'" }
+
+literal = {
+    number | string | chr | bool
+}
+
+typ_int  = { "int" }
+typ_float  = { "float" }
+typ_char = { "char" }
+typ_str = { "str" }
+
+typ = { typ_int | typ_float | typ_char | typ_str | ident }
+
+inc = { "++" }
+dec = { "--" }
+
+post_inc = { inc } 
+post_dec = { dec }
+
+field_access = { "." }
+method_access = { ":" }
+add = { "+" }
+subtract = { "-" }
+multiply = { "*" }
+divide = { "/" }
+pow = { "**" }
+mod = { "%" }
+and = { "&&" }
+or = { "||" }
+bit_and = { "&" }
+bit_or = { "|" }
+bit_xor = { "^" }
+eq = { "==" }
+neq = { "!=" }
+greater = { ">" }
+lesser = { "<" }
+greater_eq = { ">=" }
+lesser_eq = { "<=" }
+assign = { "=" }
+comma = { "," }
+
+not = { "!" }
+bit_not = { "~" }
+
+infix = _{ 
+    add
+  | subtract
+  | multiply
+  | divide
+  | pow
+  | mod
+  | and
+  | or
+  | bit_and
+  | bit_or
+  | bit_xor
+  | field_access
+  | method_access
+  | eq
+  | neq
+  | greater
+  | lesser
+  | greater_eq
+  | lesser_eq
+  | assign
+  | comma
+}
+
+prefix = _{
+    inc
+  | dec
+  | plus
+  | minus
+  | not
+  | bit_not
+}
+
+
+postfix = _{ post_inc | post_dec }
+
+atom = _{ literal | ident | ("(" ~ expr ~ ")") }
+primary = _{ prefix* ~ atom ~ postfix* }
+call = { primary ~ "(" ~ expr? ~ ")" }
+assignment = { 
+    let? ~ ident ~ typ? ~ "=" ~ expr
+  | let ~ ident ~ typ
+}
+expr = { 
+    call
+  | assignment
+  | primary ~ (infix ~ primary)* 
+}
+
+
+stmt = {
+    expr ~ ";"? ~ NEWLINE
+}
+stmts = {
+    "{" ~ (NEWLINE* ~ stmt ~ NEWLINE*)* ~ "}"
+    | expr
+}
+
+function_parameter = { ident ~ typ }
+function_parameters = {
+    ( "(" ~ (
+        ((function_parameter ~ ",")+ ~ (function_parameter))
+        | (function_parameter)?
+    ) ~ ")" )?
+}
+
+function = { "def" ~ ident ~ function_parameters ~ "=>" ~ stmts ~ NEWLINE? }
+
+file = {
+    SOI 
+    ~ (NEWLINE? ~ function ~ NEWLINE?)+
+    ~ EOI
+}

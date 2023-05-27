@@ -1,0 +1,17 @@
+[package]
+name = "func"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = "0.4.24"
+fern = "0.6.2"
+lazy_static = "1.4.0"
+log = "0.4.17"
+pest = { version = "2.0" }
+pest_derive = { version = "2.0" }
+regex = "1.8.3"
+snailquote = "0.3.1"
+thiserror = "1.0.40"
