@@ -124,6 +124,15 @@ impl Parse for Ident {
                 name: ident,
                 span: span(&line),
             })
+        } else if matches!(rule, Rule::ID_anon) {
+            trace!("[EndOf:1] validate-rule (ID_anon)");
+
+            trace!("[Start:2] construct-anonymous");
+            let ident = line.as_str().to_owned();
+            trace!("[EndOf:2] construct-anonymous");
+
+            trace!("[EndOf] parse-ident");
+            Ok(Self::ident(ident, span(&line))?)
         } else if matches!(rule, Rule::ident) {
             trace!("[EndOf:1] validate-rule (ident)");
 

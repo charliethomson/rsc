@@ -1,11 +1,7 @@
 use log::trace;
 use pest::iterators::Pair;
 
-use crate::{
-    next,
-    parser::error::{missing, ParseResult},
-    validate_rule, Rule,
-};
+use crate::{next, parser::error::ParseResult, validate_rule, Rule};
 
 use super::{function_parameter::FunctionParameter, ident::Ident, statement::Statement, Parse};
 

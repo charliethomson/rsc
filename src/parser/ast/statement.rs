@@ -10,6 +10,7 @@ use super::{expr::Expression, ident::Ident, Parse};
 
 #[derive(Debug, Clone)]
 pub enum Statement {
+    Nop,
     Expression(Box<Expression>),
     // TODO: Maybe merge assn & decl
     Assignment {
@@ -36,6 +37,7 @@ impl Parse for Statement {
                 let rule = line.into_inner().next().ok_or(missing("stmt(root)"))?;
                 match rule.as_rule() {
                     Rule::expr => Self::Expression(Expression::parse_boxed(rule)?),
+                    Rule::nop => Self::Nop,
                     _ => unreachable!(),
                 }
             }

@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashMap, HashSet},
+    collections::HashMap,
     sync::{Mutex, MutexGuard},
 };
 
@@ -8,7 +8,7 @@ use once_cell::sync::OnceCell;
 
 use crate::parser::error::{context_uninitialized, unexpected_lock, ParseError, ParseResult};
 
-use super::{ident::Ident, Span};
+use super::Span;
 
 static INSTANCE: OnceCell<Mutex<ParseContext>> = OnceCell::new();
 

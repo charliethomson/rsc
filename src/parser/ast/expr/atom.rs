@@ -22,7 +22,7 @@ impl Parse for Atom {
                 let rule = line.into_inner().next().ok_or(missing("atom:literal"))?;
                 return Ok(Self::Literal(Literal::parse(rule)?));
             }
-            Rule::ident => {
+            Rule::ident | Rule::ID_anon => {
                 return Ok(Self::Ident(Ident::parse(line)?));
             }
             rule => {

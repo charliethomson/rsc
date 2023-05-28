@@ -5,7 +5,7 @@ use thiserror::Error;
 
 use crate::Rule;
 
-use super::ast::{ident::Ident, Span};
+use super::ast::Span;
 
 #[derive(Debug, Error)]
 pub enum ParseError {

@@ -1,1 +1,9 @@
 fn main => foo.bar(biz.buf() + 2)
+
+fn main => {
+    let foo = do {
+        (a + b) => do.shit()
+        b - a => do.other_shit()
+        _ => do.last_shit()
+    }
+}

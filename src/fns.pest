@@ -3,17 +3,26 @@ WHITESPACE = _{ " " }
 KW_let = _{ "let" }
 KW_fn = _{ "fn" }
 KW_type = _{ "type" }
+KW_if = _{ "if" }
+KW_else = _{ "else" }
 keyword = _{
     KW_let
   | KW_fn
   | KW_type
+  | KW_if
+  | KW_else
 }
+
+ID_anon = { "_" }
+
+SYM_arrow = _{ "=>" }
 
 ident_char = _{ ASCII_ALPHANUMERIC | "_" }
 ident      =  @{
     !keyword ~ ASCII_ALPHA ~ ident_char* 
   | !keyword ~ "_" ~ ident_char+ 
   | !keyword ~ "$" ~ ASCII_DIGIT?
+  | !keyword ~ ID_anon
 }
 
 plus  = { "+" }
@@ -120,21 +129,38 @@ prefix = _{
 postfix = _{ post_inc | post_dec }
 
 parenthesized_expr = { "(" ~ expr? ~ ")" }
+call_params = { parenthesized_expr }
 atom = _{ literal | ident | (parenthesized_expr) }
-primary = _{ prefix* ~ atom ~ postfix* ~ (parenthesized_expr)* }
+primary = _{ prefix* ~ atom ~ postfix* ~ (call_params)* }
 assignment = { 
     KW_let? ~ ident ~ ident? ~ "=" ~ expr
   | KW_let ~ ident ~ ident
 }
+do_expr = {
+  "do" ~ "{" ~ NEWLINE* ~ ( (ID_anon | expr) ~ SYM_arrow ~ NEWLINE* ~ expr ~ NEWLINE*)* ~ NEWLINE* ~ "}"
+}
 infix_expr = { primary ~ (infix ~ primary)* }
 expr = { 
-    assignment
-  | infix_expr 
+    parenthesized_expr
+    | assignment
+    | do_expr
+    | infix_expr 
 }
 
 
+conditional_statement = {
+    KW_if ~ parenthesized_expr ~ stmts 
+  ~ (KW_else ~ conditional_statement)*
+  ~ (KW_else ~ stmts)*
+}
+
+
+nop = { ";" }
+
 stmt = {
-    expr ~ ";"? ~ NEWLINE
+    expr ~ nop? ~ NEWLINE
+    | conditional_statement
+    | nop
 }
 stmts = {
     "{" ~ (NEWLINE* ~ stmt ~ NEWLINE*)* ~ "}"
@@ -152,7 +178,7 @@ function_parameters = {
     ) ~ ")" )?
 }
 
-function = { KW_fn ~ ident ~ function_parameters ~ ident? ~ "=>" ~ stmts ~ NEWLINE? }
+function = { KW_fn ~ ident ~ function_parameters ~ ident? ~ SYM_arrow ~ stmts ~ NEWLINE? }
 
 field_definition = {
     ident ~ ident? ~ "=" ~ expr
