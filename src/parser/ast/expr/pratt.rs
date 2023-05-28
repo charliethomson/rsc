@@ -37,7 +37,8 @@ lazy_static::lazy_static! {
 
             .op(Op::postfix(Rule::post_inc)
                 | Op::postfix(Rule::post_dec)
-                | Op::infix(Rule::field_access, Left))
+                | Op::infix(Rule::field_access, Left)
+                | Op::postfix(Rule::parenthesized_expr))
 
     };
 }

@@ -119,18 +119,16 @@ prefix = _{
 
 postfix = _{ post_inc | post_dec }
 
-atom = _{ literal | ident | ("(" ~ expr ~ ")") }
-primary = _{ prefix* ~ atom ~ postfix* }
-// TODO: `call`s are weird, investigate making them "a normal expression"
-call = { (infix_expr)  ~ "(" ~ expr? ~ ")" }
+parenthesized_expr = { "(" ~ expr? ~ ")" }
+atom = _{ literal | ident | (parenthesized_expr) }
+primary = _{ prefix* ~ atom ~ postfix* ~ (parenthesized_expr)* }
 assignment = { 
     KW_let? ~ ident ~ ident? ~ "=" ~ expr
   | KW_let ~ ident ~ ident
 }
 infix_expr = { primary ~ (infix ~ primary)* }
 expr = { 
-    call
-  | assignment
+    assignment
   | infix_expr 
 }
 

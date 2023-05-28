@@ -37,7 +37,7 @@ pub enum Expression {
     },
     Call {
         lhs: SubExp,
-        params: SubExp,
+        params: Option<SubExp>,
     },
     Assignment {
         name: Ident,
@@ -46,31 +46,14 @@ pub enum Expression {
     },
 }
 impl Expression {
+    pub fn boxed(self) -> Box<Self> {
+        Box::new(self)
+    }
     pub fn parse_boxed(line: Pair<Rule>) -> ParseResult<Box<Self>> {
         Ok(Box::new(Self::parse(line)?))
     }
 }
 impl Expression {
-    fn parse_call(rule: Pair<Rule>) -> Primary {
-        trace!("[Start] expr:parse-call");
-
-        trace!("[Start:1] validate-rule");
-        validate_rule!(rule.as_rule(), call);
-        trace!("[EndOf:1] validate-rule");
-
-        trace!("[Start:2] get-rules");
-        let mut rules = rule.into_inner();
-        let lhs = rules.next().ok_or(missing("expr-call(ident)"))?;
-        let params = rules.next().ok_or(missing("expr-call(params)"))?;
-        trace!("[EndOf:2] get-rules");
-
-        let call = Self::Call {
-            lhs: Expression::parse_boxed(lhs)?,
-            params: Expression::parse_boxed(params)?,
-        };
-        trace!("[EndOf] expr:parse-call");
-        Ok(call)
-    }
     fn parse_assignment(rule: Pair<Rule>) -> Primary {
         trace!("[Start] expr:parse-assignment");
         validate_rule!(rule.as_rule(), assignment, field_definition);
@@ -100,7 +83,6 @@ impl Expression {
         trace!("[Start] map-primary({:?})", rule);
         let primary = match primary.as_rule() {
             Rule::expr | Rule::infix_expr => Expression::parse(primary)?,
-            Rule::call => Self::parse_call(primary)?,
             Rule::assignment => Self::parse_assignment(primary)?,
             _ => Self::Atom(Atom::parse(primary)?),
         };
@@ -122,6 +104,21 @@ impl Expression {
     }
     fn map_postfix(lhs: Primary, op: Pair<Rule>) -> Primary {
         trace!("[Start] map-postfix");
+        match op.as_rule() {
+            Rule::parenthesized_expr => {
+                return Ok(Self::Call {
+                    lhs: lhs?.boxed(),
+                    params: op
+                        .into_inner()
+                        .next()
+                        .map(Self::map_primary)
+                        .transpose()?
+                        .map(Self::boxed),
+                });
+            }
+            _ => {}
+        }
+
         let operator = Operator::parse(op)?;
         let primary = Self::PostfixOperation {
             operator,

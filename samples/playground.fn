@@ -1,9 +1,1 @@
-type stack {
-    buffer int
-
-    fn push (self, value int) => buffer.push(value)
-    fn pop (self) int => buffer.remove(buffer.len - 1)
-    fn pop (self) int => {
-        buffer.remove(buffer.len - 1)
-    }
-}
+fn main => foo.bar(biz.buf() + 2)

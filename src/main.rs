@@ -46,6 +46,7 @@ fn main() {
         println!("Rule: {:?}", line.as_rule());
         match line.as_rule() {
             Rule::function => {
+                println!("{:#?}", line);
                 let f = Function::parse(line).unwrap();
                 println!("{:#?}", f);
             }
