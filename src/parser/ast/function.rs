@@ -2,6 +2,7 @@ use log::trace;
 use pest::iterators::Pair;
 
 use crate::{
+    next,
     parser::error::{missing, ParseResult},
     validate_rule, Rule,
 };
@@ -12,12 +13,12 @@ use super::{function_parameter::FunctionParameter, ident::Ident, statement::Stat
 pub struct Function {
     pub func_name: Ident,
     pub params: Vec<FunctionParameter>,
+    pub return_type: Option<Ident>,
     pub body: Vec<Statement>,
 }
 impl Parse for Function {
     fn parse(line: Pair<Rule>) -> ParseResult<Self> {
         trace!("[Start] parse-function");
-        trace!("Line={}", line);
 
         let rule = line.as_rule();
         trace!("[Start:1] validate-rule");
@@ -26,9 +27,14 @@ impl Parse for Function {
 
         trace!("[Start:2] get-rules");
         let mut rules = line.into_inner();
-        let ident = rules.next().ok_or(missing("function(ident)"))?;
-        let params = rules.next().ok_or(missing("function(params)"))?;
-        let body = rules.next().ok_or(missing("function(body)"))?;
+        let ident = next!(rules, "function(ident)");
+        let params = next!(rules, "function(params)");
+        let maybe_return_type = next!(rules, "function(return-type-or-body)");
+        let (return_type, body) = if matches!(maybe_return_type.as_rule(), Rule::ident) {
+            (Some(maybe_return_type), next!(rules, "function(body)"))
+        } else {
+            (None, maybe_return_type)
+        };
         trace!("[EndOf:2] get-rules");
 
         trace!("[Start:3] parse-params");
@@ -50,6 +56,7 @@ impl Parse for Function {
         let function = Self {
             func_name: Ident::parse(ident)?,
             params,
+            return_type: return_type.map(Ident::parse).transpose()?,
             body,
         };
         trace!("[EndOf:5] construct-function");

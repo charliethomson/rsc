@@ -2,7 +2,8 @@ use log::trace;
 use pest::iterators::Pair;
 
 use crate::{
-    parser::error::{missing, ParseResult},
+    next,
+    parser::error::{missing, ParseError, ParseResult},
     validate_rule, Rule,
 };
 
@@ -27,34 +28,30 @@ impl Parse for FunctionParameter {
 
         trace!("[Start:2] get-rules");
         let mut rules = line.into_inner();
-        let p1 = rules.next();
-        let (name, ty) = match p1.as_ref().map(|p| p.as_rule()) {
-            None => (None, None),
-            Some(Rule::ident) => match rules.next() {
-                Some(p2) => {
-                    validate_rule!(p2.as_rule(), ident);
-                    (p1, Some(p2))
-                }
-                None => (p1, None),
-            },
-            Some(Rule::native) => (None, p1),
-            _ => unreachable!(),
+        let p1 = next!(rules, "function-parameter(arg1)");
+        let p1 = Ident::parse(p1)?;
+
+        let (name, ty) = if p1.is_type() {
+            // type
+            (None, Some(p1))
+        } else {
+            if let Some(p2) = rules.next() {
+                // name type
+                let p2 = Ident::parse_expect_type(p2)?;
+                (Some(p1), Some(p2))
+            } else {
+                // name
+                (Some(p1), None)
+            }
         };
 
         trace!("[EndOf:2] get-rules");
 
         trace!("[Start:3] construct-parameter");
         let parameter = match (name, ty) {
-            (Some(name), Some(ty)) => Self::NamedAndTyped {
-                name: Ident::parse(name)?,
-                ty: Ident::parse(ty)?,
-            },
-            (Some(name), None) => Self::NamedDynamic {
-                name: Ident::parse(name)?,
-            },
-            (None, Some(ty)) => Self::Anonymous {
-                ty: Ident::parse(ty)?,
-            },
+            (Some(name), Some(ty)) => Self::NamedAndTyped { name, ty },
+            (Some(name), None) => Self::NamedDynamic { name },
+            (None, Some(ty)) => Self::Anonymous { ty },
             _ => unreachable!(),
         };
         trace!("[EndOf:3] construct-parameter");

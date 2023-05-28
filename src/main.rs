@@ -11,6 +11,7 @@ pub mod parser;
 use std::fs;
 
 use crate::parser::ast::function::Function;
+use crate::parser::ast::type_definition::TypeDefinition;
 use crate::parser::ast::Parse;
 
 fn setup_logger() -> Result<(), fern::InitError> {
@@ -42,13 +43,16 @@ fn main() {
         .unwrap(); // get and unwrap the `file` rule; never fails
 
     for line in file.into_inner() {
+        println!("Rule: {:?}", line.as_rule());
         match line.as_rule() {
             Rule::function => {
                 let f = Function::parse(line).unwrap();
                 println!("{:#?}", f);
             }
-            Rule::literal => {
-                println!("line={:#?}", line);
+            Rule::type_definition => {
+                println!("{:#?}", line);
+                let t = TypeDefinition::parse(line).unwrap();
+                println!("{:#?}", t);
             }
             _ => {}
         }

@@ -35,8 +35,6 @@ pub enum Operator {
     BitXor,
     // field_access
     FieldAccess,
-    // method_access
-    MethodAccess,
     // eq
     Eq,
     // neq
@@ -79,7 +77,6 @@ impl Parse for Operator {
             Rule::bit_or => Ok(Self::BitOr),
             Rule::bit_xor => Ok(Self::BitXor),
             Rule::field_access => Ok(Self::FieldAccess),
-            Rule::method_access => Ok(Self::MethodAccess),
             Rule::eq => Ok(Self::Eq),
             Rule::neq => Ok(Self::Neq),
             Rule::greater => Ok(Self::Greater),
@@ -107,7 +104,6 @@ impl Parse for Operator {
                         Rule::bit_or,
                         Rule::bit_xor,
                         Rule::field_access,
-                        Rule::method_access,
                         Rule::eq,
                         Rule::neq,
                         Rule::greater,

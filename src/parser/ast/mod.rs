@@ -10,6 +10,7 @@ pub mod function;
 pub mod function_parameter;
 pub mod ident;
 pub mod statement;
+pub mod type_definition;
 
 pub trait Parse: Sized {
     fn parse(line: Pair<Rule>) -> ParseResult<Self>;

@@ -61,7 +61,6 @@ post_inc = { inc }
 post_dec = { dec }
 
 field_access = { "." }
-method_access = { ":" }
 add = { "+" }
 subtract = { "-" }
 multiply = { "*" }
@@ -98,7 +97,6 @@ infix = _{
   | bit_or
   | bit_xor
   | field_access
-  | method_access
   | eq
   | neq
   | greater
@@ -123,15 +121,17 @@ postfix = _{ post_inc | post_dec }
 
 atom = _{ literal | ident | ("(" ~ expr ~ ")") }
 primary = _{ prefix* ~ atom ~ postfix* }
-call = { primary ~ "(" ~ expr? ~ ")" }
+// TODO: `call`s are weird, investigate making them "a normal expression"
+call = { (infix_expr)  ~ "(" ~ expr? ~ ")" }
 assignment = { 
     KW_let? ~ ident ~ ident? ~ "=" ~ expr
   | KW_let ~ ident ~ ident
 }
+infix_expr = { primary ~ (infix ~ primary)* }
 expr = { 
     call
   | assignment
-  | primary ~ (infix ~ primary)* 
+  | infix_expr 
 }
 
 
@@ -144,9 +144,8 @@ stmts = {
 }
 
 function_parameter = { 
-    ident ~ ident
-  | native
-  | ident
+  // name type | name | type
+    ident ~ ident?
 }
 function_parameters = {
     ( "(" ~ (
@@ -155,10 +154,26 @@ function_parameters = {
     ) ~ ")" )?
 }
 
-function = { KW_fn ~ ident ~ function_parameters ~ "=>" ~ stmts ~ NEWLINE? }
+function = { KW_fn ~ ident ~ function_parameters ~ ident? ~ "=>" ~ stmts ~ NEWLINE? }
+
+field_definition = {
+    ident ~ ident? ~ "=" ~ expr
+  | ident ~ ident
+}
+type_internal  = _{
+    field_definition
+  | function
+}
+
+type_definition = { KW_type ~ ident ~ NEWLINE* ~ "{" ~ NEWLINE* ~ (type_internal~ NEWLINE*)* ~ NEWLINE* ~ "}" }
+
+TL_ITEM = _{
+    function
+  | type_definition
+}
 
 file = {
     SOI 
-    ~ (NEWLINE? ~ function ~ NEWLINE?)+
+    ~ (NEWLINE? ~ TL_ITEM ~ NEWLINE?)+
     ~ EOI
 }

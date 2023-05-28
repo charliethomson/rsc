@@ -1,7 +1,8 @@
-use log::trace;
+use log::{trace, warn};
 use pest::iterators::Pair;
 
 use crate::{
+    next,
     parser::error::{missing, ParseResult},
     validate_rule, Rule,
 };
@@ -52,10 +53,16 @@ impl Expression {
 impl Expression {
     fn parse_call(rule: Pair<Rule>) -> Primary {
         trace!("[Start] expr:parse-call");
+
+        trace!("[Start:1] validate-rule");
         validate_rule!(rule.as_rule(), call);
+        trace!("[EndOf:1] validate-rule");
+
+        trace!("[Start:2] get-rules");
         let mut rules = rule.into_inner();
         let lhs = rules.next().ok_or(missing("expr-call(ident)"))?;
         let params = rules.next().ok_or(missing("expr-call(params)"))?;
+        trace!("[EndOf:2] get-rules");
 
         let call = Self::Call {
             lhs: Expression::parse_boxed(lhs)?,
@@ -66,13 +73,12 @@ impl Expression {
     }
     fn parse_assignment(rule: Pair<Rule>) -> Primary {
         trace!("[Start] expr:parse-assignment");
-        validate_rule!(rule.as_rule(), assignment);
+        validate_rule!(rule.as_rule(), assignment, field_definition);
+
         let mut rules = rule.into_inner();
 
-        let ident = rules.next().ok_or(missing("expr-assignment(ident)"))?;
-        let type_or_value = rules
-            .next()
-            .ok_or(missing("expr-assignment(type_or_value)"))?;
+        let ident = next!(rules, "expr-assignment(ident)");
+        let type_or_value = next!(rules, "expr-assignment(type_or_value)");
         let (typ, value) = if matches!(type_or_value.as_rule(), Rule::expr) {
             (None, Some(type_or_value))
         } else {
@@ -93,7 +99,7 @@ impl Expression {
         let rule = primary.as_rule();
         trace!("[Start] map-primary({:?})", rule);
         let primary = match primary.as_rule() {
-            Rule::expr => Expression::parse(primary)?,
+            Rule::expr | Rule::infix_expr => Expression::parse(primary)?,
             Rule::call => Self::parse_call(primary)?,
             Rule::assignment => Self::parse_assignment(primary)?,
             _ => Self::Atom(Atom::parse(primary)?),
@@ -138,7 +144,7 @@ impl Expression {
 impl Parse for Expression {
     fn parse(line: Pair<Rule>) -> ParseResult<Self> {
         let rule = line.as_rule();
-        validate_rule!(rule, expr, ident, literal);
+        validate_rule!(rule, expr, ident, literal, field_definition, infix_expr);
 
         match rule {
             Rule::literal | Rule::ident => Ok(Self::Atom(Atom::parse(line)?)),

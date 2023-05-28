@@ -28,6 +28,11 @@ pub enum ParseError {
     },
     #[error("Duplicate type definition")]
     DuplicateType { ident: String },
+    #[error("Failed to convert from string")]
+    FromStrError {
+        reason: String,
+        origin: &'static str,
+    },
     #[error("Expected type, got identifier")]
     ExpectedType { ident: String, span: Span },
 }
@@ -46,6 +51,9 @@ pub fn unexpected_lock(origin: &'static str) -> ParseError {
         message: "Context locked - this shouldn't be possible.",
         origin,
     }
+}
+pub fn bad_fromstr(reason: String, origin: &'static str) -> ParseError {
+    ParseError::FromStrError { reason, origin }
 }
 
 pub type ParseResult<T> = Result<T, ParseError>;
